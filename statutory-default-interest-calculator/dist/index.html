@@ -27,6 +27,11 @@
     .breakdown{margin-top:15px;border:1px solid var(--line);border-radius:12px;overflow:hidden}.row{display:grid;grid-template-columns:65px 1fr auto;gap:10px;padding:11px 13px;font-size:12px;align-items:center}.row+.row{border-top:1px solid var(--line)}.row .year{font-weight:900;color:var(--blue)}.row .days{color:var(--muted)}.row .part{font-variant-numeric:tabular-nums;font-weight:750}
     .copy{width:100%;margin-top:12px;padding:11px;border:1px solid var(--line);border-radius:11px;background:transparent;color:var(--blue);font:750 14px inherit;cursor:pointer}
     .note{grid-column:1/-1;margin-top:4px;padding:17px 20px;border-left:4px solid var(--gold);border-radius:0 12px 12px 0;background:rgba(255,255,255,.6);font-size:13px;line-height:1.75;color:#576474}.note strong{color:var(--ink)}
+    .privacy{grid-column:1/-1;margin-top:14px;padding:18px 20px;border:1px solid #d8ddd9;background:rgba(255,255,255,.65);border-radius:14px;color:#576474;font-size:13px;line-height:1.75}
+    .privacy strong{color:var(--ink)}
+    .privacy h3{margin:0 0 8px;font-size:14px;color:var(--blue);font-weight:850}
+    .privacy p{margin:0 0 6px}.privacy p:last-child{margin-bottom:0}
+    .privacy code{background:#e9f1f6;padding:2px 5px;border-radius:4px;font-family:monospace;font-size:12px;color:var(--blue2)}
     footer{display:flex;justify-content:space-between;gap:20px;margin-top:38px;padding-top:18px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}footer a{color:inherit}
     @media(max-width:860px){main{grid-template-columns:1fr}.intro{padding-top:0}.laws{grid-template-columns:1fr 1fr}.calculator{max-width:620px;width:100%}.note{margin-top:0}}
     @media(max-width:560px){.shell{width:min(100% - 22px,1120px);padding-top:20px}header{margin-bottom:28px}.back{display:none}h1{font-size:42px}.lead{font-size:16px}.laws{grid-template-columns:1fr}.dates{grid-template-columns:1fr}.calculator{padding:21px;border-radius:19px}.interest .amount{font-size:39px}.row{grid-template-columns:52px 1fr}.row .part{grid-column:2}footer{display:block;line-height:1.8}}
@@ -74,6 +79,13 @@
       </section>
 
       <aside class="note"><strong>計算口徑：</strong>起算日與計算止日均計入。跨年度時，依各年度實際天數分段計算（平年 365 日、閏年 366 日），各段不先取整，合計後四捨五入至元。本工具適用未約定利率且無其他法律規定的情形；實際遲延起算日、清償日及適用利率，仍應依契約與個案法律關係確認。</aside>
+
+      <section class="privacy" aria-label="隱私權與資料保護說明">
+        <h3>隱私權與資料保護說明</h3>
+        <p><strong>計算資料不留存：</strong>本計算器為純前端本地即時運算工具，您所輸入的本金、利息起算日與計算止日，均僅在您的瀏覽器本機記憶體處理，伺服器絕不蒐集、傳輸或儲存任何計算參數或財務案件資料。</p>
+        <p><strong>匿名使用量統計：</strong>僅在您按下「計算遲延利息」且產出有效結果時，系統會記錄一次匿名使用事件。伺服器僅會記錄事件時間（台北時區）、經 HMAC-SHA256 雜湊處理之訪客識別碼（不留存原始 IP），以及遮罩處理後之電子郵件（如 <code>yu***@example.com</code>）。</p>
+        <p><strong>資料保存與目的：</strong>上述去識別化之統計數據僅保存最多 30 日，期滿自動刪除；僅用於每日產生使用量統計報告與系統維護，絕不移作其他用途。</p>
+      </section>
     </main>
     <footer><span>計算規則版本：2026.10</span><span>資料來源：<a href="https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=B0000001" target="_blank" rel="noreferrer">全國法規資料庫</a>・<a href="https://www.judicial.gov.tw/" target="_blank" rel="noreferrer">司法院</a></span></footer>
   </div>
@@ -120,6 +132,7 @@
         : `<strong>跨年度分段計算</strong><br>各年度利息合計 NT$ ${exactMoney(total)}，四捨五入為 <strong>NT$ ${money(rounded)}</strong>`;
       $('#breakdown').innerHTML=rows.map(r=>`<div class="row"><span class="year">${r.year}</span><span class="days">${dateKey(r.start)} ～ ${dateKey(r.end)}｜${r.days} ÷ ${r.denominator} 日</span><span class="part">NT$ ${exactMoney(r.interest)}</span></div>`).join('');
       $('#result').hidden=false;$('#result').scrollIntoView({behavior:'smooth',block:'nearest'});
+      try { fetch('/api/usage', { method: 'POST', keepalive: true }).catch(() => {}); } catch (_) {}
     }
 
     $('#principal').addEventListener('blur',e=>{const n=Number(e.target.value.replace(/[,，\s]/g,''));if(Number.isFinite(n)&&n>0)e.target.value=new Intl.NumberFormat('zh-TW',{maximumFractionDigits:2}).format(n)});

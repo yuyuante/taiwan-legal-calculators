@@ -1,4 +1,5 @@
 *-package.tar.gz
+.handoff/
 .DS_Store
 Thumbs.db
 
